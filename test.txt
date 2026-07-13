@@ -1,0 +1,12 @@
+BookWise is an AI document assistant.
+
+RAG stands for Retrieval Augmented Generation.
+
+RAG combines two components:
+1. Retrieval system
+2. Language generation model
+
+Documents are converted into embeddings.
+FAISS stores embeddings and performs similarity search.
+
+Users can upload documents and ask questions about their uploaded files.
