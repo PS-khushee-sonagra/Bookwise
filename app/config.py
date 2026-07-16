@@ -7,8 +7,6 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-print("Loaded API Key:", (GEMINI_API_KEY[:10] + "...") if GEMINI_API_KEY else "None")
-
 # Project root
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,4 +40,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 FAISS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Caching and persistence
-PERSISTENT_INDEXING = False
+PERSISTENT_INDEXING = False
+
+# Similarity threshold for document chunk filtering
+SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.35"))

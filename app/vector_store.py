@@ -8,6 +8,7 @@ Responsibilities:
 - Perform similarity search.
 """
 
+import sentence_transformers
 from pathlib import Path
 from typing import Dict, List
 import logging
@@ -18,8 +19,10 @@ import faiss
 # pyrefly: ignore [missing-import]
 import numpy as np
 
-from app.config import PERSISTENT_INDEXING
-
+from app.config import (
+    PERSISTENT_INDEXING,
+    SIMILARITY_THRESHOLD,
+)
 logger = logging.getLogger(__name__)
 
 
@@ -182,10 +185,16 @@ class VectorStore:
 
         results = []
 
+        MIN_SCORE = SIMILARITY_THRESHOLD
         for score, idx in zip(
             distances[0],
             indices[0],
+            
         ):
+            if score < MIN_SCORE:
+              continue
+
+
             # Check for invalid index (like -1 which is returned by FAISS when it can't find matches)
             # or index out of range to prevent incorrect metadata mapping
             if idx < 0 or idx >= len(self.metadata):

@@ -18,7 +18,7 @@ from app.embedding_generator import EmbeddingGenerator
 from app.vector_store import VectorStore
 from app.prompt_builder import PromptBuilder
 from app.llm import LLMGenerator
-from app.config import FAISS_DIR
+from app.config import FAISS_DIR, SIMILARITY_THRESHOLD
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 class RAGPipeline:
 
-    def __init__(self):
+    def __init__(self, similarity_threshold: float = SIMILARITY_THRESHOLD):
 
         self.chunker = Chunker()
 
@@ -40,7 +40,17 @@ class RAGPipeline:
 
         self.llm = LLMGenerator()
 
-        self.clear_index()
+        self.similarity_threshold = similarity_threshold
+
+        # Load existing index if it exists on disk, otherwise prepare to create one
+        if self.vector_store.index_path.exists() and self.vector_store.metadata_path.exists():
+            try:
+                self.vector_store.load()
+                logger.info("Loaded existing FAISS index from disk.")
+            except Exception as e:
+                logger.warning("Failed to load existing FAISS index on startup: %s", e)
+        else:
+            logger.info("No existing FAISS index found on disk. A new one will be created when indexing.")
 
     def clear_index(self, force: bool = False) -> None:
         """
@@ -133,7 +143,8 @@ class RAGPipeline:
 
     def ask(
         self,
-        question: str
+        question: str,
+        threshold: float | None = None,
     ) -> dict:
         """
         Answer question using RAG.
@@ -145,6 +156,8 @@ class RAGPipeline:
         Query Embedding
             ↓
         FAISS Search
+            ↓
+        Threshold Filtering
             ↓
         Prompt Builder
             ↓
@@ -200,11 +213,38 @@ class RAGPipeline:
                 len(results)
             )
 
+            # Determine the similarity threshold to use
+            current_threshold = (
+                threshold if threshold is not None else self.similarity_threshold
+            )
 
-            # 4. Build grounded prompt
+            # Filter retrieved chunks based on the similarity threshold
+            filtered_chunks = [
+                chunk for chunk in results
+                if chunk.get("score", 0.0) >= current_threshold
+            ]
+
+            
+            logger.info(
+                "Filtered %d chunks to %d chunks with score >= %f",
+                len(results),
+                len(filtered_chunks),
+                current_threshold,
+            )
+
+            # If no chunks meet the relevance threshold, return fallback response and skip LLM
+            if not filtered_chunks:
+                logger.info("No chunks passed the relevance threshold. Skipping LLM call.")
+                return {
+                    "answer": "I couldn't find relevant information in the uploaded documents.",
+                    "pages": []
+                }
+
+
+            # 4. Build grounded prompt using only filtered chunks
             prompt = self.prompt_builder.build_prompt(
                 question,
-                results
+                filtered_chunks
             )
 
 
@@ -214,10 +254,10 @@ class RAGPipeline:
             )
 
 
-            # 6. Extract source pages and document names
+            # 6. Extract source pages and document names from filtered chunks only
             unique_sources = set()
 
-            for chunk in results:
+            for chunk in filtered_chunks:
 
                 if isinstance(chunk, dict):
 

@@ -41,6 +41,7 @@ results = store.search(
     top_k=5,
 )
 
+
 print()
 
 print("Top Results:\n")

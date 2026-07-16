@@ -1,8 +1,11 @@
 # pyrefly: ignore [missing-import]
 import streamlit as st
+import logging
 
 from app.document_processor import DocumentProcessor
 from app.rag_pipeline import RAGPipeline
+
+logger = logging.getLogger("streamlit_app")
 
 
 st.set_page_config(
@@ -84,9 +87,9 @@ if uploaded_files:
 
 
             except Exception as e:
-
+                logger.exception("Document processing failed internally.")
                 st.error(
-                    f"Document processing failed: {e}"
+                    "Document processing failed. Please check the document and try again."
                 )
 
 
@@ -140,7 +143,7 @@ if st.button("Ask"):
 
 
             except Exception as e:
-
+                logger.exception("Unable to answer question internally.")
                 st.error(
-                    f"Unable to answer question: {e}"
+                    "Unable to answer the question. Please try again later."
                 )
