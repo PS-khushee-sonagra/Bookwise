@@ -1,5 +1,5 @@
 """
-Test script for BookWise RAG Pipeline
+Demo script for BookWise RAG Pipeline
 
 Flow tested:
 
@@ -20,7 +20,13 @@ Prompt Builder
 Gemini LLM
 """
 
+import os
+import sys
 import logging
+
+# Add project root to sys.path to allow importing app
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
 
 from app.rag_pipeline import RAGPipeline
 from app.document_processor import DocumentProcessor
@@ -51,10 +57,8 @@ def main():
 
         print("\nProcessing PDF...\n")
 
-
-        pages = processor.extract_text(
-            "test.pdf"
-        )
+        pdf_path = os.path.join(project_root, "test.pdf")
+        pages = processor.extract_text(pdf_path)
 
 
         print(

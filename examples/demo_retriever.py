@@ -1,3 +1,10 @@
+import os
+import sys
+
+# Add project root to sys.path to allow importing app
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
 from app.config import FAISS_DIR
 from app.embedding_generator import EmbeddingGenerator
 from app.vector_store import VectorStore

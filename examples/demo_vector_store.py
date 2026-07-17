@@ -1,3 +1,10 @@
+import os
+import sys
+
+# Add project root to sys.path to allow importing app
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
 from app.config import FAISS_DIR
 from app.document_processor import DocumentProcessor
 from app.chunker import Chunker
@@ -8,9 +15,8 @@ processor = DocumentProcessor()
 chunker = Chunker()
 embedder = EmbeddingGenerator()
 
-pages = processor.extract_text(
-    "data/uploads/rich-dad-poor-dad.pdf"
-)
+pdf_path = os.path.join(project_root, "data", "uploads", "rich-dad-poor-dad.pdf")
+pages = processor.extract_text(pdf_path)
 
 chunks = chunker.create_chunks(
     pages,
