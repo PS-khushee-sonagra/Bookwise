@@ -254,33 +254,28 @@ class RAGPipeline:
             )
 
 
-            # 6. Extract source pages and document names from filtered chunks, keeping max similarity score for each page
+            # 6. Extract source pages and document names from only the most relevant filtered chunks
             source_scores = {}
 
-            for chunk in filtered_chunks:
+            if filtered_chunks:
+                scores = [chunk.get("score", 0.0) for chunk in filtered_chunks if isinstance(chunk, dict)]
+                top_score = max(scores) if scores else 0.0
+                avg_score = sum(scores) / len(scores) if scores else 0.0
+                citation_threshold = max(avg_score, top_score - 0.10)
 
-                if isinstance(chunk, dict):
+                for chunk in filtered_chunks:
+                    if isinstance(chunk, dict):
+                        score = chunk.get("score", 0.0)
+                        if score >= citation_threshold:
+                            metadata = chunk.get("metadata", {})
+                            source = metadata.get("source")
+                            page_number = metadata.get("page_number")
 
-                    metadata = chunk.get(
-                        "metadata",
-                        {}
-                    )
-
-                    source = metadata.get(
-                        "source"
-                    )
-
-                    page_number = metadata.get(
-                        "page_number"
-                    )
-
-                    score = chunk.get("score", 0.0)
-
-                    if page_number:
-                        doc_name = source if source else "Unknown Document"
-                        key = (doc_name, page_number)
-                        if key not in source_scores or score > source_scores[key]:
-                            source_scores[key] = score
+                            if page_number:
+                                doc_name = source if source else "Unknown Document"
+                                key = (doc_name, page_number)
+                                if key not in source_scores or score > source_scores[key]:
+                                    source_scores[key] = score
 
 
             # Sort citations by similarity score (highest first).
