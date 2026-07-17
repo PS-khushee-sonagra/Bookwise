@@ -26,8 +26,7 @@ Instructions:
 3. If the answer cannot be found in the Context, reply exactly:
    "I don't know based on the uploaded document."
 4. Keep the answer accurate, structured, and easy to read. Use bullet points or numbered lists where appropriate.
-5. At the end of every answer, include:
-   Source Pages: <page numbers>
+5. Do NOT include any source pages, page numbers, citations, or a "Source Pages" section in your answer. The application will handle citation generation separately.
 """
 
     def build_prompt(

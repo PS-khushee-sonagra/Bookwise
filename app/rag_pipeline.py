@@ -253,6 +253,12 @@ class RAGPipeline:
                 prompt
             )
 
+            # Remove any LLM-generated "Source Pages" section for consistency
+            import re
+            parts = re.split(r"\bSource\s+Pages?\s*:", answer, flags=re.IGNORECASE)
+            if parts:
+                answer = parts[0].strip()
+
 
             # 6. Extract source pages and document names from only the most relevant filtered chunks
             source_scores = {}
