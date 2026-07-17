@@ -254,8 +254,8 @@ class RAGPipeline:
             )
 
 
-            # 6. Extract source pages and document names from filtered chunks only
-            unique_sources = set()
+            # 6. Extract source pages and document names from filtered chunks, keeping max similarity score for each page
+            source_scores = {}
 
             for chunk in filtered_chunks:
 
@@ -274,20 +274,20 @@ class RAGPipeline:
                         "page_number"
                     )
 
-                    if source and page_number:
-                        unique_sources.add(
-                            (source, page_number)
-                        )
-                    elif page_number:
-                        unique_sources.add(
-                            ("Unknown Document", page_number)
-                        )
+                    score = chunk.get("score", 0.0)
+
+                    if page_number:
+                        doc_name = source if source else "Unknown Document"
+                        key = (doc_name, page_number)
+                        if key not in source_scores or score > source_scores[key]:
+                            source_scores[key] = score
 
 
-            # Sort by document name first, then by page number
+            # Sort citations by similarity score (highest first).
+            # If scores are identical, sub-sort by document name and page number for consistency.
             sorted_sources = sorted(
-                list(unique_sources),
-                key=lambda x: (x[0], x[1])
+                source_scores.keys(),
+                key=lambda x: (-source_scores[x], x[0], x[1])
             )
 
 
