@@ -63,7 +63,7 @@ class VectorStore:
                 logger.warning("Failed to load existing index/metadata: %s", e)
 
         dimension = embeddings.shape[1]
-
+        
         if self.index is None:
             self.index = faiss.IndexFlatIP(dimension)
             self.index.add(
