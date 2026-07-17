@@ -2,3 +2,14 @@
 .venv/
 __pycache__/
 *.pyc
+
+# Pytest cache
+.pytest_cache/
+
+# IDE files
+.vscode/
+
+# Dynamically uploaded/indexed documents and FAISS data
+data/faiss_index/
+data/*.pdf
+data/uploads/*.pdf

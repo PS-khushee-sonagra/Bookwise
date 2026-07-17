@@ -104,6 +104,8 @@ class VectorStore:
             self.metadata_path,
             "wb",
         ) as f:
+            # NOTE: pickle is used here for storing metadata.
+            # Only serialize/deserialize data from trusted local storage.
             pickle.dump(self.metadata, f)
 
         logger.info("Vector store saved.")
@@ -131,6 +133,9 @@ class VectorStore:
             self.metadata_path,
             "rb",
         ) as f:
+            # SECURITY NOTE: pickle.load is vulnerable to arbitrary code execution
+            # if loading an untrusted file. Ensure this file is only loaded from
+            # a trusted local source (e.g. locally indexed metadata).
             self.metadata = pickle.load(f)
 
         if self.index.ntotal != len(self.metadata):

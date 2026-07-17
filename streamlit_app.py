@@ -30,7 +30,10 @@ try:
     pipeline = load_pipeline()
 
 except Exception as e:
-    st.error(f"Unable to initialize RAG pipeline: {e}")
+    logger.exception("Unable to initialize RAG pipeline.")
+    st.error(
+        "Unable to initialize the application. Please try again later or check the application logs."
+    )
     st.stop()
 
 

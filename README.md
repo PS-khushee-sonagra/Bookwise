@@ -135,15 +135,18 @@ We use `pytest` for automated test coverage:
 ```bash
 pytest
 ```
-This runs all the unit and integration tests under the `tests/` folder. The manual verification scripts (`test_config.py`, etc.) are also retained in the root directory.
+This runs all the unit and integration tests under the `tests/` folder. The manual verification scripts (`demo_config.py`, etc.) are also retained in the `examples/` directory.
 
 ---
 
 ## 🔒 Security & Privacy
 
-- **No API Key Logging:** API keys are never printed, written to logs, or exposed partially in stdout.
-- **User-Friendly Error Handling:** Raw application/backend traceback exceptions are caught internally and logged in diagnostic files. The user is displayed a clean, generic error message in the Streamlit UI.
-- **Local Data Ingestion:** All PDF parsing, text chunking, and embedding generation processes happen locally on your hardware. Only the small subset of relevant context chunks that pass the relevance filter is sent to Google's API to construct the response.
+- **API Key Management:** API keys are stored in environment variables (managed via `.env` file, which is excluded from Git tracking).
+- **No API Key Logging:** API keys or partial keys are never printed, written to logs, or exposed in stdout or the UI.
+- **Local Data Ingestion:** All PDF parsing, text chunking, and embedding generation processes happen locally on your hardware before retrieval.
+- **Data Transmission to Gemini API:** Only the retrieved document text matching the search context (scores >= threshold) is sent to the Google Gemini API for answer generation.
+- **User Discretion:** Users should avoid uploading confidential or highly sensitive documents unless explicitly permitted by their organization's data protection policies.
+- **User-Friendly Error Handling:** Raw application traceback exceptions are caught internally and logged in diagnostic files. The user is displayed a clean, generic error message in the Streamlit UI.
 
 ---
 
