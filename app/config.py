@@ -44,3 +44,10 @@ PERSISTENT_INDEXING = False
 
 # Similarity threshold for document chunk filtering
 SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.35"))
+
+# Retrieval and Prompt Context configuration
+TOP_K = int(os.getenv("TOP_K", "8"))
+MAX_CONTEXT_CHUNKS = int(os.getenv("MAX_CONTEXT_CHUNKS", "8"))
+
+# Logging configurations
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

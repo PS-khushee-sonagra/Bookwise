@@ -18,7 +18,7 @@ from app.embedding_generator import EmbeddingGenerator
 from app.vector_store import VectorStore
 from app.prompt_builder import PromptBuilder
 from app.llm import LLMGenerator
-from app.config import FAISS_DIR, SIMILARITY_THRESHOLD
+from app.config import FAISS_DIR, SIMILARITY_THRESHOLD, TOP_K
 
 
 logger = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ class RAGPipeline:
             # 3. Retrieve relevant chunks
             results = self.vector_store.search(
                 query_embedding,
-                top_k=8
+                top_k=TOP_K
             )
 
 

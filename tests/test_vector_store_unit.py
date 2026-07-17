@@ -33,6 +33,24 @@ def test_vector_store_operations(tmp_path):
     store.add_documents(embeddings, chunks)
     assert store.index is not None
     assert len(store.metadata) == 2
+    assert store.index.ntotal == 2
+    
+    # 2.5 Add more documents and assert index size increases
+    more_chunks = [
+        {
+            "chunk_id": "doc1_p1_c3",
+            "text": "Third chunk content.",
+            "page_number": 1,
+            "metadata": {"source": "doc1.pdf", "page_number": 1}
+        }
+    ]
+    more_embeddings = np.array([
+        [0.0, 0.0, 1.0] + [0.0] * 381
+    ], dtype=np.float32)
+    
+    store.add_documents(more_embeddings, more_chunks)
+    assert store.index.ntotal == 3
+    assert len(store.metadata) == 3
     
     # 3. Save index
     store.save()
@@ -43,7 +61,7 @@ def test_vector_store_operations(tmp_path):
     new_store = VectorStore(index_dir=tmp_path)
     new_store.load()
     assert new_store.index is not None
-    assert len(new_store.metadata) == 2
+    assert len(new_store.metadata) == 3
     assert new_store.metadata[0]["chunk_id"] == "doc1_p1_c1"
     
     # 5. Search
